@@ -1,0 +1,5 @@
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_C_COMPILER /opt/android/v15-arm/bin/arm-linux-androideabi-gcc)
+set(CMAKE_CXX_COMPILER /opt/android/v15-arm/bin/arm-linux-androideabi-g++)
+set(CMAKE_INCLUDE_PATH /opt/android/v15-arm/include)
+set(CMAKE_LIBRARY_PATH /opt/android/v15-arm/lib)

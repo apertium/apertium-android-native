@@ -1,0 +1,21 @@
+icu
+/opt/android/v15-arm.sh ../source/configure --enable-tools=no --enable-tests=no --enable-samples=no --host=arm-linux-androideabi --prefix=/opt/android/v15-arm --with-cross-build=/misc/icu/native SHELL=bash
+
+libxml2
+/opt/android/v15-arm.sh ./configure --host=arm-linux-androideabi --prefix=/opt/android/v15-arm/ --without-python --without-threads --without-http --without-ftp --with-icu --without-iconv --without-zlib --without-lzma
+
+cg3
+/opt/android/v15-arm.sh ./cmake.sh -DUSE_TCMALLOC=off -DCMAKE_TOOLCHAIN_FILE=/opt/android/v15-arm.cmake --prefix=/tmp/v15
+
+lttoolbox, apertium, apertium-lex-tools
+/opt/android/v15-arm.sh ./configure --host=arm-linux-androideabi --prefix=/tmp/v15
+
+hfst
+/opt/android/v15-arm.sh ./configure --host=arm-linux-androideabi --prefix=/tmp/v15 --enable-all-tools --with-unicode-handler=ICU
+
+/opt/android/v15-arm/bin/arm-linux-androideabi-readelf -d bin/* lib/* 2>/dev/null | grep 'Shared library' | egrep -o '\[.+?\]' | sort | uniq | perl -wpne 's/^.//; s/.$//;' | xargs -rn1 '-I{}' rsync -avuL '/opt/android/v15-arm/lib/{}' lib/
+
+cd /data/local/tmp
+export PATH=/data/local/tmp/apertium-all-dev/bin:$PATH
+export LD_LIBRARY_PATH=/data/local/tmp/apertium-all-dev/lib:$LD_LIBRARY_PATH
+cp -a /data/data/org.qtproject.example.apertium_simpleton/files/* ./

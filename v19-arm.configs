@@ -1,0 +1,33 @@
+../android-ndk-r12b/build/tools/make_standalone_toolchain.py --arch arm --api 19 -v --install-dir . --force
+
+glob
+/opt/android/v19-arm.sh clang $CFLAGS -I. -c glob.c -o glob.o
+/opt/android/v19-arm.sh clang $CFLAGS glob.o -shared -o libglob.so
+/opt/android/v19-arm/bin/arm-linux-androideabi-strip libglob.so
+cp -av glob.h /opt/android/v19-arm/include/
+cp -av libglob.so /opt/android/v19-arm/lib/
+
+icu
+/opt/android/v19-arm.sh ../source/configure --enable-tools=no --enable-tests=no --enable-samples=no --host=arm-linux-androideabi --prefix=/opt/android/v19-arm --with-cross-build=/misc/icu/native SHELL=bash
+
+libxml2
+/opt/android/v19-arm.sh ./configure --host=arm-linux-androideabi --prefix=/opt/android/v19-arm/ --without-python --without-threads --without-http --without-ftp --with-icu --without-iconv --without-zlib --without-lzma
+
+pcre
+/opt/android/v19-arm.sh ./configure --host=arm-linux-androideabi --prefix=/opt/android/v19-arm/ --enable-utf --enable-unicode-properties --disable-static --enable-cpp --enable-pcre16 --enable-pcre32
+
+cg3
+/opt/android/v19-arm.sh ./cmake.sh -DUSE_TCMALLOC=off -DCMAKE_TOOLCHAIN_FILE=/opt/android/v19-arm.cmake --prefix=/tmp/v19
+
+lttoolbox, apertium, apertium-lex-tools
+/opt/android/v19-arm.sh ./configure --host=arm-linux-androideabi --prefix=/tmp/v19
+
+hfst
+/opt/android/v19-arm.sh ./configure --host=arm-linux-androideabi --prefix=/tmp/v19 --enable-all-tools --with-unicode-handler=ICU
+
+/opt/android/v19-arm/bin/arm-linux-androideabi-readelf -d bin/* lib/* 2>/dev/null | grep 'Shared library' | egrep -o '\[.+?\]' | sort | uniq | perl -wpne 's/^.//; s/.$//;' | xargs -rn1 '-I{}' rsync -avuL '/opt/android/v19-arm/lib/{}' lib/
+
+cd /data/local/tmp
+export PATH=/data/local/tmp/apertium-all-dev/bin:$PATH
+export LD_LIBRARY_PATH=/data/local/tmp/apertium-all-dev/lib:$LD_LIBRARY_PATH
+cp -a /data/data/org.qtproject.example.apertium_simpleton/files/* ./
